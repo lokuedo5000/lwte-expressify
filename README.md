@@ -1,6 +1,6 @@
 # Documentación del Módulo lwte-expressify
 
-Este es un módulo de Node.js llamado `lwte-expressify` que permite descargar archivos desde una URL y guardarlos localmente en el sistema de archivos. A continuación, encontrarás información sobre cómo instalar y usar este módulo en tus proyectos.
+`lwte-expressify` es un módulo de Node.js que proporciona una clase llamada `ServerBuilder`. Esta clase facilita la creación y configuración de aplicaciones web utilizando el framework Express.js. Ofrece una forma organizada y reutilizable de crear múltiples instancias de aplicaciones Express con diferentes rutas y configuraciones.
 
 ## Instalación
 

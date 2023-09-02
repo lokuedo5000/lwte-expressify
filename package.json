@@ -1,6 +1,6 @@
 {
   "name": "lwte-expressify",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A lightweight and efficient Node.js module for simplified Express.js server creation and management.",
   "homepage": "https://github.com/lokuedo5000/lwte-expressify",
   "main": "index.js",
@@ -37,6 +37,7 @@
     "express": "^4.18.2"
   },
   "files": [
+    "bin/*",
     "index.js",
     "lwte-expressify.d.ts"
   ]

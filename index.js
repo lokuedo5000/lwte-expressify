@@ -8,13 +8,13 @@ class ServerBuilder {
     this.servercreate = false;
 
     if (!viewspath) {
-      this.viewspath = path.join(__dirname, "views");
+      this.viewspath = path.join(__dirname, "bin", "views");
     }else{
       this.viewspath = path.join(viewspath);
     }
 
     if (!publicpath) {
-      this.publicpath = path.join(__dirname, "public");
+      this.publicpath = path.join(__dirname, "bin", "public");
     }else{
       this.publicpath = path.join(publicpath);
     }
