@@ -1,0 +1,43 @@
+{
+  "name": "lwte-expressify",
+  "version": "1.0.0",
+  "description": "A lightweight and efficient Node.js module for simplified Express.js server creation and management.",
+  "homepage": "https://github.com/lokuedo5000/lwte-expressify",
+  "main": "index.js",
+  "types": "lwte-expressify.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lokuedo5000/lwte-expressify.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "ejs",
+    "express.js",
+    "server",
+    "web",
+    "development",
+    "framework",
+    "Node.js",
+    "middleware",
+    "HTTP",
+    "REST",
+    "backend",
+    "MVC",
+    "routing",
+    "API",
+    "rapid development"
+  ],
+  "author": "Lwte",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2"
+  },
+  "files": [
+    "index.js",
+    "lwte-expressify.d.ts"
+  ]
+}

@@ -1,0 +1,1 @@
+declare module 'lwte-expressify.d.ts';
