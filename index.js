@@ -96,7 +96,6 @@ class ServerBuilder {
 
   stopServer(serverName) {
     if (this.appInstances[serverName]) {
-      console.log(this.appInstances[serverName]);
       const server = this.appInstances[serverName].server;
       if (server) { // Verificar si 'server' está definido antes de intentar cerrarlo
         server.close();
