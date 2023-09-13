@@ -1,159 +1,135 @@
-# Documentación del Módulo lwte-expressify
+# Using the lwte-expressify Module
 
-`lwte-expressify` es un módulo de Node.js que proporciona una clase llamada `ServerBuilder`. Esta clase facilita la creación y configuración de aplicaciones web utilizando el framework Express.js. Ofrece una forma organizada y reutilizable de crear múltiples instancias de aplicaciones Express con diferentes rutas y configuraciones.
+The `lwte-expressify` module is a tool that allows you to create and manage Express.js-based web servers in a Node.js application effortlessly. Below, you'll find the main functionalities and how to use them:
 
-## Instalación
+## Installation
 
-Para instalar este módulo, Abre tu terminal y ejecuta el siguiente comando:
+Make sure Node.js is installed on your system before using this module. You can install it using npm or yarn.
 
 ```bash
 npm install lwte-expressify
 ```
 
-## Uso
+## Importing the Module
 
-Una vez que hayas instalado el módulo, puedes usarlo en tus proyectos de Node.js. Aquí tienes un ejemplo de cómo importar y usar la clase `ServerBuilder` en tu código:
+First, import the module into your Node.js file to start using it:
 
 ```javascript
-// Importar el Module
 const ServerBuilder = require("lwte-expressify");
-
-// Crear una instancia de ServerBuilder con las rutas de vistas y archivos públicos
-const server = new ServerBuilder({
-  viewspath: "./views",
-  publicpath: "./public",
-});
-
-(async () => {
-  // Crear el server 1
-  const success_one = await server.newServer({
-    name: "server1",
-    filejs: "./router1.js",
-    port: 3010,
-  });
-
-  // Respuesta
-  if (success_one) {
-    console.log("servidor 1 creado con exito.");
-  } else {
-    console.log("error al crear el servidor 1");
-  }
-
-  // Crear el server 2
-  const success_two = await server.newServer({
-    name: "server2",
-    filejs: "./router2.js",
-    port: 3020,
-  });
-
-  // Respuesta
-  if (success_two) {
-    console.log("servidor 2 creado con exito.");
-  } else {
-    console.log("error al crear el servidor 2");
-  }
-})();
+const serverBuilder = new ServerBuilder();
 ```
 
-## Rutas `router1.js`
+## Creating a New Server
+
+You can use the newServer method to create a new web server. This method takes a configuration object with the following parameters:
 
 ```javascript
-const routes = [
-  {
-    method: "get",
-    path: "/",
-    handler: (req, res) => {
-      // Configuración para la ruta de Inicio
-      res.send("¡Bienvenido a la página de inicio de myApp!");
-    },
-  },
-  {
-    method: "get",
-    path: "/about",
-    handler: (req, res) => {
-      // Configuración para la ruta '/about'
-      res.send("Acerca de myApp");
-    },
-  },
-  {
-    method: "post",
-    path: "/submit",
-    handler: (req, res) => {
-      // Configuración para la ruta '/submit'
-      res.json({ message: "Datos enviados correctamente" });
-    },
-  },
-];
+const serverConfig = {
+  name: "MyServer",
+  routers: "./routes/routes.js",
+  port: 3000,
+  pathViews: "./my/view/path",
+  pathPublic: "./my/public/path",
+};
 
-module.exports = routes;
+const success = await serverBuilder.newServer(serverConfig);
+if (success) {
+  console.log("Server created successfully.");
+} else {
+  console.error("Error creating the server.");
+}
+
+// You can add more servers with different names and configurations.
 ```
 
-### Url
+## Defining Routes in the `routes.js` File
 
-http://localhost:3010/
+The `routes.js` file is crucial for configuring routes for your server in "lwte-expressify". Follow these guidelines to define effective routes:
 
-## Rutas `router2.js`
+1. Create an array named `routes` to store the server's routes. Each route is defined as an object within this array.
+
+2. Each route object must have three main properties:
+
+   - `method`: Specifies the HTTP method used to access this route (e.g., "get," "post," "put," "delete," etc.).
+
+   - `path`: Indicates the URL or relative path that triggers this route when accessed from the browser.
+
+   - `handler`: Contains a function that will execute when the corresponding route is accessed. This function takes two arguments: `req` (the client's request) and `res` (the response to be sent to the client).
+
+3. For example, the following code defines a "get" route that responds to the root path ("/") and sends a welcome message to the client when that route is accessed:
+
+   ```javascript
+   let routes = [
+     {
+       method: "get",
+       path: "/",
+       handler: (req, res) => {
+         res.send("Welcome to the myApp home page!");
+       },
+     },
+     {
+       method: "get",
+       path: "/home",
+       handler: (req, res) => {
+         res.send("Welcome to the home page");
+       },
+     }
+
+     // You can add more routes this way
+   ];
+   module.exports = routes;
+   ```
+
+## Stopping a Server
+
+You can stop a server using the `stopServer` method by passing the server's name as a parameter. This method closes the server and removes it from the list of active servers.
+
+Example of stopping a server:
 
 ```javascript
-const routes = [
-  {
-    method: "get",
-    path: "/",
-    handler: (req, res) => {
-      // Configuración para la ruta de Inicio
-      res.send("¡Bienvenido a la página de inicio de myApp!");
-    },
-  },
-  {
-    method: "get",
-    path: "/about",
-    handler: (req, res) => {
-      // Configuración para la ruta '/about'
-      res.send("Acerca de myApp");
-    },
-  },
-  {
-    method: "post",
-    path: "/submit",
-    handler: (req, res) => {
-      // Configuración para la ruta '/submit'
-      res.json({ message: "Datos enviados correctamente" });
-    },
-  },
-];
+const serverName = "MyServer";
+const result = serverBuilder.stopServer(serverName);
 
-module.exports = routes;
+if (result.response) {
+  console.log(result.message);
+} else {
+  console.error(result.message);
+}
 ```
 
-### Url
+## Additional Notes
 
-http://localhost:3020/
+- You can customize the view and public static file paths by providing `pathViews` and `pathPublic` when creating a server.
+- The `isPortAvailable` function is used to check if a specific port is available before starting a server on that port.
+- The module also includes additional functionalities that are commented and labeled as `coming soon` in the source code, suggesting they may be available in future versions.
 
-### Nombre del Desarrollador
+This module is useful when you need to efficiently manage Express.js-based web servers within a single Node.js application.
 
-- Nombre: lokuedo5000
-- Correo Electrónico: lokuedo5001@email.com
-- Perfil de GitHub: https://github.com/lokuedo5000
+### Developer Name
 
-Si tienes alguna pregunta o necesitas soporte técnico, no dudes en ponerte en contacto con el desarrollador.
+- Name: lokuedo5000
+- Email: lokuedo5001@gmail.com
+- GitHub profile: https://github.com/lokuedo5000
 
-Si encuentras algún problema o necesitas ayuda con el módulo `lwte-expressify`, aquí tienes algunas opciones:
+If you have any questions or need technical support, feel free to contact the developer.
 
-### Informar un Problema
+If you run into any problems or need help with the `lwte-expressify` module, here are some options:
 
-Si crees que has encontrado un error o un problema con el módulo, por favor crea un "issue" en el repositorio oficial en [GitHub](https://github.com/lokuedo5000/lwte-expressify/issues). Asegúrate de proporcionar la siguiente información al informar un problema:
+### Report a Problem
 
-- Descripción detallada del problema.
-- Paso a paso para reproducir el problema.
-- Capturas de pantalla (si es aplicable).
-- Versión del módulo y versión de Node.js que estás utilizando.
+If you think you have found a bug or a problem with the module, please create an "issue" in the official repository at [GitHub](https://github.com/lokuedo5000/lwte-expressify/issues). Be sure to provide the following information when reporting a problem:
 
-### Soporte Comunitario
+- Detailed description of the problem.
+- Step by step to reproduce the problem.
+- Screenshots (if applicable).
+- Module version and version of Node.js that you are using.
 
-Si tienes preguntas generales sobre el uso del módulo o necesitas orientación, puedes publicar tus preguntas en la sección de "Discusiones" del repositorio en GitHub. La comunidad de usuarios y el desarrollador pueden ayudarte con tus consultas.
+### Community Support
 
-### Contactar al Desarrollador
+If you have general questions about using the module or need guidance, you can post your questions in the "Discussions" section of the GitHub repository. The user community and the developer can help you with your queries.
 
-Si tienes consultas más específicas o necesitas ayuda urgente, puedes ponerte en contacto directamente con el desarrollador a través de su correo electrónico: lokuedo5001@email.com.
+### Contact Developer
 
-Por favor, sé lo más claro y detallado posible al describir cualquier problema o pregunta que puedas tener. Estamos aquí para ayudarte a resolver cualquier dificultad que encuentres al utilizar `lwte-expressify`.
+If you have more specific questions or need urgent help, you can contact the developer directly through his email: lokuedo5001@gmail.com.
+
+Please be as clear and detailed as possible when describing any issues or questions you may have. We are here to help you solve any difficulties you encounter when using `lwte-expressify`.

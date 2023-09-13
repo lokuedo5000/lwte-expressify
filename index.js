@@ -3,31 +3,25 @@ const express = require('express');
 const net = require('node:net');
 
 class ServerBuilder {
-  constructor({viewspath, publicpath}) {
+  constructor() {
     this.appInstances = {}; // Almacenará las instancias de las aplicaciones
     this.servercreate = false;
 
-    if (!viewspath) {
-      this.viewspath = path.join(__dirname, "bin", "views");
-    }else{
-      this.viewspath = path.join(viewspath);
-    }
+    // Views
+    this.viewspath = path.join(__dirname, "bin", "views");
 
-    if (!publicpath) {
-      this.publicpath = path.join(__dirname, "bin", "public");
-    }else{
-      this.publicpath = path.join(publicpath);
-    }
+    // Public
+    this.publicpath = path.join(__dirname, "bin", "public");
 
 
   }
 
-  setupAppMiddleware(app) {
+  setupAppMiddleware(app, {pathViews, pathPublic}) {
     app.use(express.urlencoded({ extended: true }));
-    app.use(express.json());
+    app.use(express.json({ limit: '100mb' }));
     app.set('view engine', 'ejs');
-    app.set('views', this.viewspath);
-    app.use(express.static(this.publicpath));
+    app.set('views', pathViews === false ? this.viewspath : pathViews);
+    app.use(express.static(pathPublic === false ? this.publicpath : pathPublic));
   }
 
   setupAppRoutes(app, appRoutes) {
@@ -48,28 +42,29 @@ class ServerBuilder {
     });
   }
 
-  async newServer(appRoute) {
-    if (this.appInstances[appRoute.name]) {
+  async newServer({name, routers, port, pathViews = false, pathPublic = false}) {
+    if (this.appInstances[name]) {
       return true;
     }
 
-    const portAvailable = await this.isPortAvailable(appRoute.port);
+    const portAvailable = await this.isPortAvailable(port);
 
     if (!portAvailable) {
       return true;
     }
 
     const app = express();
-    const appRoutes = require(appRoute.filejs);
+    this.setupAppMiddleware(app, {pathViews, pathPublic});
 
-    this.setupAppMiddleware(app);
+    const appRoutes = require(routers);
     this.setupAppRoutes(app, appRoutes);
 
-    const success = await this.startServerAsync(app, appRoute.port);
+    const server = await this.startServerAsync(app, port);
 
-    if (success) {
-      this.appInstances[appRoute.name] = {
-        app
+    if (server) {
+      this.appInstances[name] = {
+        app,
+        server
       };
       return true;
     } else {
@@ -80,34 +75,47 @@ class ServerBuilder {
   async startServerAsync(app, port) {
     return new Promise((resolve, reject) => {
       const server = app.listen(port, () => {
-        resolve(true);
+        resolve(server);
       }).on('error', err => {
         resolve(false);
       });
     });
   }
 
-  addNewRoute(appName, newRoute) {
-    if (this.appInstances[appName]) {
-      const app = this.appInstances[appName].app;
-      // const server = this.appInstances[appName].server;
+  // coming soon
+  // addNewRoute(appName, newRoute) {
+  //   if (this.appInstances[appName]) {
+  //     const app = this.appInstances[appName].app;
+  //     app[newRoute.method.toLowerCase()](newRoute.path, newRoute.handler);
 
-      app[newRoute.method.toLowerCase()](newRoute.path, newRoute.handler);
+  //     console.log(`New route added to ${appName}: ${newRoute.path}`);
+  //   } else {
+  //     console.log(`App ${appName} not found.`);
+  //   }
+  // }
 
-      console.log(`New route added to ${appName}: ${newRoute.path}`);
+  stopServer(serverName) {
+    if (this.appInstances[serverName]) {
+      console.log(this.appInstances[serverName]);
+      const server = this.appInstances[serverName].server;
+      if (server) { // Verificar si 'server' está definido antes de intentar cerrarlo
+        server.close();
+        delete this.appInstances[serverName];
+        return {
+          message: `Server for ${serverName} stopped.`,
+          response: true
+        }
+      } else {
+        return {
+          message: `Server for ${serverName} is not defined.`,
+          response: false
+        }
+      }
     } else {
-      console.log(`App ${appName} not found.`);
-    }
-  }
-
-  stopApp(appName) {
-    if (this.appInstances[appName]) {
-      const server = this.appInstances[appName].server;
-      server.close();
-      console.log(`Server for ${appName} stopped.`);
-      delete this.appInstances[appName];
-    } else {
-      console.log(`App ${appName} not found.`);
+      return {
+        message: `App ${serverName} not found.`,
+        response: false
+      }
     }
   }
 
